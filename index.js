@@ -1,59 +1,70 @@
-const inquirer = require('inquirer');
 const fs = require('fs');
+const path = require('path');
+const { Triangle, Circle, Square } = require('./lib/shapes');
 
-const questions = [
-  {
-    type: 'input',
-    name: 'text',
-    message: 'Enter up to three characters for the logo text:',
-    validate: input => input.length <= 3 || 'Text must be up to three characters.',
-  },
-  {
-    type: 'input',
-    name: 'textColor',
-    message: 'Enter a color keyword or hexadecimal number for the text color:',
-  },
-  {
-    type: 'list',
-    name: 'shape',
-    message: 'Choose a shape for the logo:',
-    choices: ['circle', 'triangle', 'square'],
-  },
-  {
-    type: 'input',
-    name: 'shapeColor',
-    message: 'Enter a color keyword or hexadecimal number for the shape color:',
-  },
-];
+(async () => {
+    const inquirer = (await import('inquirer')).default;
 
-inquirer.prompt(questions).then(answers => {
-  const svgContent = generateSVG(answers);
-  fs.writeFile('logo.svg', svgContent, err => {
-    if (err) throw err;
-    console.log('Generated logo.svg');
-  });
-});
+    const questions = [
+        {
+            type: 'input',
+            name: 'text',
+            message: 'Enter up to three characters for the logo:',
+            validate: input => input.length <= 3 || 'Text must be up to 3 characters.',
+        },
+        {
+            type: 'input',
+            name: 'textColor',
+            message: 'Enter the text color (keyword or hexadecimal):',
+        },
+        {
+            type: 'list',
+            name: 'shape',
+            message: 'Choose a shape for the logo:',
+            choices: ['Circle', 'Triangle', 'Square'],
+        },
+        {
+            type: 'input',
+            name: 'shapeColor',
+            message: 'Enter the shape color (keyword or hexadecimal):',
+        },
+    ];
 
-function generateSVG({ text, textColor, shape, shapeColor }) {
-  let shapeElement;
-  switch (shape) {
-    case 'circle':
-      shapeElement = `<circle cx="150" cy="100" r="80" fill="${shapeColor}" />`;
-      break;
-    case 'triangle':
-      shapeElement = `<polygon points="150,10 290,190 10,190" fill="${shapeColor}" />`;
-      break;
-    case 'square':
-      shapeElement = `<rect x="50" y="50" width="200" height="200" fill="${shapeColor}" />`;
-      break;
-  }
+    function generateSVG({ text, textColor, shape, shapeColor }) {
+        let shapeInstance;
+        switch (shape) {
+            case 'Circle':
+                shapeInstance = new Circle();
+                break;
+            case 'Triangle':
+                shapeInstance = new Triangle();
+                break;
+            case 'Square':
+                shapeInstance = new Square();
+                break;
+        }
+        shapeInstance.setColor(shapeColor);
 
-  const textElement = `<text x="150" y="125" font-size="60" text-anchor="middle" fill="${textColor}">${text}</text>`;
-  
-  return `
-    <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
-      ${shapeElement}
-      ${textElement}
-    </svg>
-  `;
-}
+        return `
+<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+    ${shapeInstance.render()}
+    <text x="150" y="125" font-size="60" text-anchor="middle" fill="${textColor}">${text}</text>
+</svg>
+        `;
+    }
+
+    inquirer.prompt(questions).then(answers => {
+        const svgContent = generateSVG(answers);
+
+        // Ensure the 'examples' directory exists
+        const outputDir = path.join(__dirname, 'examples');
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir);
+        }
+
+        // Write the file to the 'examples' directory
+        const filePath = path.join(outputDir, 'logo.svg');
+        fs.writeFileSync(filePath, svgContent);
+        console.log(`Logo generated in ${filePath}`);
+    });
+})();
