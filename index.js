@@ -1,15 +1,19 @@
-const fs = require('fs');
-const path = require('path');
-const { Triangle, Circle, Square } = require('./lib/shapes');
+// Import necessary modules
+const fs = require('fs'); // File system module for file operations
+const path = require('path'); // Path module for handling file paths
+const generateSVG = require('./lib/generateSVG'); // Import the generateSVG function
 
 (async () => {
+    // Dynamically import 'inquirer' to handle user prompts
     const inquirer = (await import('inquirer')).default;
 
+    // Define the questions to ask the user
     const questions = [
         {
             type: 'input',
             name: 'text',
             message: 'Enter up to three characters for the logo:',
+            // Validate that the input is up to three characters
             validate: input => input.length <= 3 || 'Text must be up to 3 characters.',
         },
         {
@@ -21,7 +25,7 @@ const { Triangle, Circle, Square } = require('./lib/shapes');
             type: 'list',
             name: 'shape',
             message: 'Choose a shape for the logo:',
-            choices: ['Circle', 'Triangle', 'Square'],
+            choices: ['Circle', 'Triangle', 'Square'], // Provide shape choices
         },
         {
             type: 'input',
@@ -30,41 +34,16 @@ const { Triangle, Circle, Square } = require('./lib/shapes');
         },
     ];
 
-    function generateSVG({ text, textColor, shape, shapeColor }) {
-        let shapeInstance;
-        switch (shape) {
-            case 'Circle':
-                shapeInstance = new Circle();
-                break;
-            case 'Triangle':
-                shapeInstance = new Triangle();
-                break;
-            case 'Square':
-                shapeInstance = new Square();
-                break;
-        }
-        shapeInstance.setColor(shapeColor);
-
-        return `
-<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
-    ${shapeInstance.render()}
-    <text x="150" y="125" font-size="60" text-anchor="middle" fill="${textColor}">${text}</text>
-</svg>
-        `;
-    }
-
+    // Prompt the user with the defined questions
     inquirer.prompt(questions).then(answers => {
+        // Generate the SVG content based on user answers
         const svgContent = generateSVG(answers);
 
-        // Ensure the 'examples' directory exists
-        const outputDir = path.join(__dirname, 'examples');
-        if (!fs.existsSync(outputDir)) {
-            fs.mkdirSync(outputDir);
-        }
-
-        // Write the file to the 'examples' directory
-        const filePath = path.join(outputDir, 'logo.svg');
+        // Define the file path for the generated logo in the main folder
+        const filePath = path.join(__dirname, 'logo.svg');
+        // Write the SVG content to the file
         fs.writeFileSync(filePath, svgContent);
+        // Log a success message
         console.log(`Logo generated in ${filePath}`);
     });
 })();
