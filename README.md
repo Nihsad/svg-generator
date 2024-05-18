@@ -11,7 +11,7 @@ This Node.js command-line application generates a simple SVG logo based on user 
     ```
 3. Run the application:
     ```bash
-    node index.js
+    npm start
     ```
 
 ## Walkthrough Video
@@ -20,7 +20,7 @@ This Node.js command-line application generates a simple SVG logo based on user 
 
 ## Example
 
-Generated `logo.svg` can be found in the `examples/` folder.
+Example .svg files generated using this application can be found in the `examples/` folder. Open in a web browser of choice to view the finished product.
 
 ## Tests
 
