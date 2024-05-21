@@ -16,7 +16,7 @@ This Node.js command-line application generates a simple SVG logo based on user 
 
 ## Walkthrough Video
 
-[Link to walkthrough video](#) <!-- Replace with actual video link -->
+[Link to walkthrough video](https://drive.google.com/file/d/1blgc5kRnztzcpC9Eqs_hwn6tTt_iz2PW/view?usp=drive_link) <!-- Replace with actual video link -->
 
 ## Example
 
